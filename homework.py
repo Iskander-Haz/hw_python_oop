@@ -27,6 +27,7 @@ class Training:
 
     LEN_STEP = 0.65
     M_IN_KM = 1000
+    MIN_IN_H = 60
 
     def __init__(self,
                  action: int,
@@ -63,7 +64,6 @@ class Training:
 
 class Running(Training):
     """Тренировка: бег."""
-    M_IN_KM = 1000
     CALORIES_MEAN_SPEED_MULTIPLIER = 18
     CALORIES_MEAN_SPEED_SHIFT = 1.79
 
@@ -82,7 +82,7 @@ class Running(Training):
                 self.CALORIES_MEAN_SPEED_MULTIPLIER * self.get_mean_speed()
                 + self.CALORIES_MEAN_SPEED_SHIFT
             )
-            * self.weight / self.M_IN_KM * self.duration / 60
+            * self.weight / self.M_IN_KM * self.duration * self.MIN_IN_H
         )
         return spent_calories
 
@@ -92,9 +92,11 @@ class Running(Training):
 
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
-    M_IN_KM = 1000
-    CALORIES_MEAN_SPEED_MULTIPLIER = 0.035
-    CALORIES_MEAN_SPEED_SHIFT = 0.029
+
+    CALORIES_WEIGHT_MULTIPLIER = 0.035
+    CALORIES_SPEED_HEIGHT_MULTIPLIER = 0.029
+    KMH_IN_MSEC = 0.278
+    CM_IN_M = 100
 
     def __init__(self,
                  action: int,
@@ -111,11 +113,14 @@ class SportsWalking(Training):
         # * 0.029 * вес) * время_тренировки_в_минутах)
         spent_calories = (
             (
-                self.CALORIES_MEAN_SPEED_MULTIPLIER * self.weight
-                + ((self.get_mean_speed() / 3.6)**2 / self.height / 100)
-                * self.CALORIES_MEAN_SPEED_SHIFT * self.weight
+                self.CALORIES_WEIGHT_MULTIPLIER * self.weight
+                + (
+                    (self.get_mean_speed() * self.KMH_IN_MSEC)**2
+                    / (self.height / self.CM_IN_M)
+                )
+                * self.CALORIES_SPEED_HEIGHT_MULTIPLIER * self.weight
             )
-            * self.duration * 60
+            * self.duration * self.MIN_IN_H
         )
         return spent_calories
 
@@ -125,10 +130,10 @@ class SportsWalking(Training):
 
 class Swimming(Training):
     """Тренировка: плавание."""
-    M_IN_KM = 1000
-    LEN_STEP = 1.38
+
     CALORIES_MEAN_SPEED_SHIFT = 1.1
     CALORIES_MEAN_SPEED_MULTIPLIER = 2
+    LEN_STEP = 1.38
 
     def __init__(self,
                  action: int,
