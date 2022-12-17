@@ -86,9 +86,6 @@ class Running(Training):
         )
         return spent_calories
 
-    def __str__(self) -> str:
-        return 'Running'
-
 
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
@@ -124,9 +121,6 @@ class SportsWalking(Training):
         )
         return spent_calories
 
-    def __str__(self) -> str:
-        return 'Walking'
-
 
 class Swimming(Training):
     """Тренировка: плавание."""
@@ -160,27 +154,29 @@ class Swimming(Training):
         )
         return spent_calories
 
-    def __str__(self) -> str:
-        return 'Swimming'
-
 
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
-    type = {
+    types_of_training = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking
     }
 
-    training = type[workout_type](*data)
-    return training
+    if workout_type in types_of_training:
+        training = types_of_training[workout_type](*data)
+        return training
+    # else: raise ValueError('Такое мы не практикуем ;)')
 
 
 def main(training: Training) -> None:
     """Главная функция."""
-
-    info: InfoMessage = training.show_training_info()
-    print(info.get_message())
+    # Использовл try-except основываясь на пройденный материал
+    try:
+        info: InfoMessage = training.show_training_info()
+        print(info.get_message())
+    except AttributeError:
+        print(f'{workout_type}?! Такое мы не практикуем ;)')
 
 
 if __name__ == '__main__':
